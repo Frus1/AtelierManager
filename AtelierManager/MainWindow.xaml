@@ -1,0 +1,94 @@
+﻿<Window x:Class="AtelierManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AtelierManager"
+        xmlns:controls="clr-namespace:AtelierManager.Controls"
+        xmlns:v="clr-namespace:AtelierManager.Views"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Управление ателье"
+        Height="720"
+        Width="1200"
+        MinHeight="620"
+        MinWidth="980"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Icon="/Assets/ateliericon.ico">
+    <Grid>
+        <controls:TabControlEx>
+            <TabItem x:Name="OrdersTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ClipboardText" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Заказы"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:OrdersView/>
+            </TabItem>
+
+            <TabItem x:Name="ClientsTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AccountGroup" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Клиенты"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:ClientsView/>
+            </TabItem>
+
+            <TabItem x:Name="MaterialsTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PackageVariantClosed" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Материалы"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:MaterialsView/>
+            </TabItem>
+
+            <TabItem x:Name="ServicesTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ScissorsCutting" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Услуги"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:ServicesView/>
+            </TabItem>
+
+            <TabItem x:Name="ReportsTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ChartBar" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Отчёты"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:ReportsView/>
+            </TabItem>
+
+
+            <TabItem x:Name="EmployeesTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="AccountTie" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Работники"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:EmployeesView/>
+            </TabItem>
+
+            <TabItem x:Name="DataTab">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Database" Width="18" Height="18" Margin="0,0,6,0"/>
+                        <TextBlock Text="Данные"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <v:DataManagementView/>
+            </TabItem>
+
+        </controls:TabControlEx>
+    </Grid>
+</Window>

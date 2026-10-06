@@ -1,0 +1,176 @@
+﻿<Window x:Class="AtelierManager.Views.MeasurementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Мерки"
+        Height="700"
+        Width="520"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/ateliersubicon.ico">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <TextBlock Text="Дата снятия мерок" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <DatePicker SelectedDate="{Binding TakenAt}" Margin="0,0,0,12"/>
+
+                <GroupBox Header="Основные мерки" Margin="0,0,0,12">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Рост"/>
+                            <TextBox Text="{Binding Height}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="ОГ"/>
+                            <TextBox Text="{Binding Chest}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="ОТ"/>
+                            <TextBox Text="{Binding Waist}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="ОБ"/>
+                            <TextBox Text="{Binding Hips}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Плечо"/>
+                            <TextBox Text="{Binding Shoulder}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Рукав"/>
+                            <TextBox Text="{Binding Sleeve}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Верх изделия" Margin="0,0,0,12">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Шея"/>
+                            <TextBox Text="{Binding Neck}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Ширина плеч"/>
+                            <TextBox Text="{Binding ShoulderWidth}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Длина спины"/>
+                            <TextBox Text="{Binding BackLength}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Запястье"/>
+                            <TextBox Text="{Binding Wrist}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Бицепс"/>
+                            <TextBox Text="{Binding Bicep}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Низ изделия" Margin="0,0,0,12">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Шаговый"/>
+                            <TextBox Text="{Binding Inseam}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Внешняя длина"/>
+                            <TextBox Text="{Binding Outseam}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Бедро"/>
+                            <TextBox Text="{Binding Thigh}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Колено"/>
+                            <TextBox Text="{Binding Knee}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
+                            <TextBlock Text="Низ"/>
+                            <TextBox Text="{Binding Ankle}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBlock Text="Высота сидения"/>
+                            <TextBox Text="{Binding Rise}"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Изделие" Margin="0,0,0,12">
+                    <StackPanel Margin="8">
+                        <TextBlock Text="Длина изделия"/>
+                        <TextBox Text="{Binding ProductLength}" Margin="0,0,0,8"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <TextBlock Text="Комментарий" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding Comment}"
+                         Height="100"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,12,0,0">
+            <Button Content="ОК" Width="100" Margin="0,0,8,0" Click="Ok_Click"/>
+            <Button Content="Отмена" Width="100" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

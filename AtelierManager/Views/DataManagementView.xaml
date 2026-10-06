@@ -1,0 +1,251 @@
+﻿<UserControl x:Class="AtelierManager.Views.DataManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Управление данными"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,16"/>
+
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="Резервное копирование" Style="{StaticResource CardTitleText}"/>
+
+                        <TextBlock Text="Основная база данных" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DatabasePath}"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.75"
+                                   Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Папка резервных копий" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding BackupDirectory}"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.75"
+                                   Margin="0,0,0,16"/>
+
+                        <WrapPanel>
+                            <Button Style="{StaticResource ActionButton}" Click="CreateBackup_Click" Margin="0,0,8,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="ContentSave" Width="16" Height="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Создать резервную копию"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Style="{StaticResource ActionButton}" Click="RestoreSelectedBackup_Click" IsEnabled="{Binding HasSelectedBackup}" Margin="0,0,8,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Переключиться на выбранную"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Style="{StaticResource ActionButton}" Click="DeleteSelectedBackup_Click" IsEnabled="{Binding HasSelectedBackup}" Margin="0,0,8,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Delete" Width="16" Height="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Удалить выбранную"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Style="{StaticResource ActionButton}" Click="RestoreBackupFromFile_Click" Margin="0,0,8,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="FolderOpen" Width="16" Height="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Выбрать файл копии"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Style="{StaticResource ActionButton}" Click="RefreshBackups_Click" Margin="0,0,8,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Refresh" Width="16" Height="16" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Обновить список"/>
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Список резервных копий" Style="{StaticResource CardTitleText}"/>
+
+                        <DataGrid Grid.Row="1"
+                                  ItemsSource="{Binding Backups}"
+                                  SelectedItem="{Binding SelectedBackup}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  RowHeaderWidth="0"
+                                  GridLinesVisibility="None"
+                                  MinHeight="220">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Что это" Binding="{Binding DisplayName}" Width="2*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextWrapping" Value="Wrap"/>
+                                            <Setter Property="Margin" Value="4"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Пояснение" Binding="{Binding Description}" Width="3*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextWrapping" Value="Wrap"/>
+                                            <Setter Property="Margin" Value="4"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm:ss}}" Width="150"/>
+                                <DataGridTextColumn Header="Размер" Binding="{Binding SizeText}" Width="90"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <Border Grid.Row="2" Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Text="Импорт и экспорт Excel" Style="{StaticResource CardTitleText}"/>
+
+                    <GroupBox Header="Все таблицы базы данных" Margin="0,0,0,12" Padding="12">
+                        <StackPanel>
+                            <WrapPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportAllTables_Click" Margin="0,0,8,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт всех таблиц"/>
+                                    </StackPanel>
+                                </Button>
+                            </WrapPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <UniformGrid Columns="3">
+                        <GroupBox Header="Клиенты" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportClients_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт клиентов"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportClients_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт клиентов"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Материалы" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportMaterials_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт материалов"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportMaterials_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт материалов"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Услуги" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportServices_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт услуг"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportServices_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт услуг"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Персоны" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportPersons_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт персон"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportPersons_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт персон"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Мерки" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportMeasurementSets_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт мерок"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportMeasurementSets_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт мерок"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Header="Заказы" Margin="0,0,8,8" Padding="12">
+                            <StackPanel>
+                                <Button Style="{StaticResource ActionButton}" Click="ExportOrders_Click" Margin="0,0,0,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Экспорт заказов"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Style="{StaticResource ActionButton}" Click="ImportOrders_Click" Margin="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="FileExcel" Width="16" Height="16" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Импорт заказов"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </GroupBox>
+                    </UniformGrid>
+
+                    <TextBlock Text="{Binding LastOperationMessage}"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Margin="0,16,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

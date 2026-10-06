@@ -1,0 +1,456 @@
+﻿<Window x:Class="AtelierManager.Views.OrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Заказ" Height="650" Width="900"
+        x:Name="OrderWindowWin"
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/ateliersubicon.ico">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,12">
+            <TextBlock Text="Заказ" FontSize="20" FontWeight="Bold"/>
+            <TextBlock Text="{Binding AccessModeHint}" TextWrapping="Wrap" Opacity="0.75" Margin="0,4,0,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLimitedWorkerEdit}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+
+                <!-- Клиент / Статус -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Клиент" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding Clients}"
+                                  SelectedItem="{Binding SelectedClient}"
+                                  DisplayMemberPath="FullName"
+                                  IsEnabled="{Binding CanEditMainOrderData}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Статус" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding Statuses}"
+                                  SelectedItem="{Binding SelectedStatus}"
+                                  DisplayMemberPath="Name"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Даты -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Дата приёма" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <DatePicker SelectedDate="{Binding IntakeDate}" IsEnabled="{Binding CanEditMainOrderData}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Срок готовности" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <DatePicker SelectedDate="{Binding DueDate}" IsEnabled="{Binding CanEditMainOrderData}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Материалы (источник/комментарий) -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Источник материала" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <ComboBox ItemsSource="{Binding MaterialSources}"
+                                  SelectedItem="{Binding MaterialSource}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Материал клиента / комментарий" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBox Text="{Binding MaterialComment}" AcceptsReturn="True" Height="70" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Материалы ателье -->
+                <GroupBox Header="Материалы ателье" Margin="0,0,0,12">
+                    <GroupBox.Style>
+                        <Style TargetType="GroupBox">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding MaterialSource}" Value="Ателье">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding MaterialSource}" Value="Смешанное">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <DataGrid x:Name="OrderMaterialsGrid"
+                                  Grid.Column="0"
+                                  ItemsSource="{Binding OrderMaterialsLines}"
+                                  SelectedItem="{Binding SelectedMaterialLine}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="False"
+                                  Height="160"
+                                  RowHeaderWidth="0"
+                                  GridLinesVisibility="None"
+                                  CellEditEnding="OrderMaterialsGrid_CellEditEnding"
+                                  CurrentCellChanged="OrderMaterialsGrid_CurrentCellChanged">
+                            <DataGrid.Columns>
+
+                                <DataGridTemplateColumn Header="Материал" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding MaterialName}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.Materials, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      SelectedValuePath="Id"
+                                                      DisplayMemberPath="Name"
+                                                      SelectedValue="{Binding MaterialId, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Кол-во" Binding="{Binding QtyUsed, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                <DataGridTextColumn Header="Цена" Binding="{Binding UnitPrice, StringFormat={}{0:0.##}, TargetNullValue=0, FallbackValue=0}" Width="80" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat={}{0:0.##}, TargetNullValue=0, FallbackValue=0}" Width="80" IsReadOnly="True"/>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Top">
+                            <Button Content="Добавить" Margin="0,0,0,8" Click="AddMaterial_Click"/>
+                            <Button Content="Удалить" Click="DeleteMaterial_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Примечание -->
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Примечание" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding Notes}" AcceptsReturn="True" Height="70" TextWrapping="Wrap" IsEnabled="{Binding CanEditMainOrderData}"/>
+                </StackPanel>
+
+                <!-- ===== Позиции заказа ===== -->
+                <TextBlock Text="Позиции заказа" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                <!-- Панель добавления позиции -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Добавить позицию" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Услуга -->
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <TextBlock Text="Услуга" Opacity="0.75"/>
+                                <ComboBox ItemsSource="{Binding Services}"
+                                          SelectedItem="{Binding SelectedServiceToAdd}"
+                                          DisplayMemberPath="Name"/>
+                            </StackPanel>
+
+                            <!-- Персона -->
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="Для кого" Opacity="0.75"/>
+                                <ComboBox ItemsSource="{Binding Persons}"
+                                          SelectedItem="{Binding SelectedPersonToAdd}"
+                                          DisplayMemberPath="DisplayName"/>
+                            </StackPanel>
+
+                            <!-- Мерки (только если Пошив) -->
+                            <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMeasurementsRequiredForNewLine}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <TextBlock Text="Мерки" Opacity="0.75"/>
+                                <ComboBox ItemsSource="{Binding MeasurementSets}"
+                                          SelectedItem="{Binding SelectedMeasurementToAdd}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Text="{Binding TakenAt, StringFormat={}{0:dd.MM.yyyy}}"/>
+                                                <TextBlock FontSize="12"
+                                                           Opacity="0.75"
+                                                           Text="{Binding Summary}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <Button Grid.Column="3"
+                                    Content="Добавить"
+                                    Margin="0,18,0,0"
+                                    Click="AddLine_Click"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Таблица позиций (БЕЗ мерок!) -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <DataGrid Grid.Column="0"
+                              ItemsSource="{Binding Lines}"
+                              SelectedItem="{Binding SelectedLine}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True"
+                              RowHeaderWidth="0"
+                              GridLinesVisibility="None"
+                              Height="180">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Услуга" Binding="{Binding Service.Name}" Width="*"/>
+                            <DataGridTextColumn Header="Для кого" Binding="{Binding Person.DisplayName}" Width="180"/>
+                            <DataGridTextColumn Header="База" Binding="{Binding BasePrice}" Width="90"/>
+                            <DataGridTextColumn Header="Итог" Binding="{Binding LineTotal}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Top">
+                        <Button Content="Удалить позицию" Click="DeleteLine_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ===== МЕРКИ ДЛЯ ВЫБРАННОЙ ПОЗИЦИИ (как надо) ===== -->
+                <GroupBox Header="Мерки выбранной позиции" Margin="0,0,0,12">
+                    <GroupBox.Style>
+                        <Style TargetType="GroupBox">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMeasurementsRequiredForSelectedLine}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
+
+                    <StackPanel>
+                        <TextBlock Text="Выберите мерки для выбранной позиции" Opacity="0.75" Margin="0,0,0,6"/>
+
+                        <ComboBox ItemsSource="{Binding SelectedLineMeasurementSets}"
+                                  SelectedItem="{Binding SelectedLineMeasurementSet}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock FontWeight="SemiBold"
+                                                   Text="{Binding TakenAt, StringFormat={}{0:dd.MM.yyyy}}"/>
+                                        <TextBlock FontSize="12"
+                                                   Opacity="0.75"
+                                                   Text="{Binding Summary}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Карточка выбранных мерок -->
+                        <Border Margin="0,10,0,0" Padding="10" CornerRadius="8" Background="#FFFFFF">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedLineMeasurementSet}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
+                            <StackPanel>
+                                <TextBlock Text="{Binding SelectedLineMeasurementSet.TakenAt, StringFormat=Сняты: {0:dd.MM.yyyy}}"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,6"/>
+
+                                <TextBlock Text="{Binding SelectedLineMeasurementSet.Summary}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,0,0,10"/>
+
+                                <!-- Верх -->
+                                <StackPanel Margin="0,0,0,8">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.TopText}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.TopText}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="Верх" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding SelectedLineMeasurementSet.TopText}" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <!-- Низ -->
+                                <StackPanel Margin="0,0,0,8">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.BottomText}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.BottomText}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="Низ" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding SelectedLineMeasurementSet.BottomText}" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <!-- Изделие -->
+                                <StackPanel Margin="0,0,0,8">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.ProductText}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding SelectedLineMeasurementSet.ProductText}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="Изделие" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                    <TextBlock Text="{Binding SelectedLineMeasurementSet.ProductText}" TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <TextBlock Text="{Binding SelectedLineMeasurementSet.Comment}"
+                                           TextWrapping="Wrap"
+                                           Opacity="0.8"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Если это пошив — мерки обязательны. Для ремонта мерки не нужны."
+                                   Margin="0,8,0,0"
+                                   Opacity="0.65"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Доп. элементы -->
+                <TextBlock Text="Доп. элементы (для выбранной позиции)"
+                           FontWeight="SemiBold"
+                           Margin="0,12,0,6"/>
+
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding AvailableExtrasForSelectedLine}"
+                              SelectedItem="{Binding SelectedExtraToAdd}"
+                              DisplayMemberPath="Name"/>
+
+                    <Button Grid.Column="1"
+                            Content="Добавить доп. элемент"
+                            Margin="12,0,0,0"
+                            Click="AddExtra_Click"/>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <DataGrid Grid.Column="0"
+                              ItemsSource="{Binding SelectedExtras}"
+                              SelectedItem="{Binding SelectedExtra}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              IsReadOnly="True"
+                              Height="160"
+                              RowHeaderWidth="0"
+                              GridLinesVisibility="None">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Элемент" Binding="{Binding ExtraElement.Name}" Width="*"/>
+                            <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="80"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="90"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Top">
+                        <Button Content="Удалить" Click="DeleteExtra_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Итог заказа -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Итого: " FontWeight="SemiBold" FontSize="16"/>
+                        <TextBlock Text="{Binding TotalCost}" FontWeight="Bold" FontSize="16"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="ОК" Width="100" Margin="0,0,8,0" IsDefault="True" Click="Ok_Click"/>
+            <Button Content="Отмена" Width="100" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

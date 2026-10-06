@@ -1,0 +1,197 @@
+﻿<UserControl x:Class="AtelierManager.Views.ServicesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="900">
+
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Список -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Услуги"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0,0,12,8"/>
+
+            <StackPanel Grid.Row="1" Margin="0,0,12,8">
+                <TextBox md:HintAssist.Hint="Поиск по названию, типу или цене"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <WrapPanel Margin="0,6,0,0">
+                    <ComboBox Width="150"
+                              Margin="0,0,6,0"
+                              md:HintAssist.Hint="Тип"
+                              ItemsSource="{Binding ServiceTypeFilters}"
+                              SelectedItem="{Binding SelectedTypeFilter}"/>
+                    <ComboBox Width="130"
+                              md:HintAssist.Hint="Активность"
+                              ItemsSource="{Binding ServiceActivityFilters}"
+                              SelectedItem="{Binding SelectedActivityFilter}"/>
+                </WrapPanel>
+            </StackPanel>
+
+            <DataGrid Grid.Row="2"
+                      ItemsSource="{Binding ServicesView}"
+                      SelectedItem="{Binding Selected}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      RowHeaderWidth="0"
+                      GridLinesVisibility="None"
+                      Margin="0,0,12,8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Тип" Binding="{Binding ServiceType}" Width="100"/>
+                    <DataGridTextColumn Header="Цена" Binding="{Binding BasePrice}" Width="100"/>
+                    <DataGridCheckBoxColumn Header="Активна" Binding="{Binding IsActive}" Width="80"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Grid.Row="3"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="0,0,12,0">
+                <Button x:Name="AddServiceButton" Style="{StaticResource ActionButton}" Click="AddService_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <md:PackIcon Kind="Plus" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Добавить"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="EditServiceButton" Style="{StaticResource ActionButton}" Click="EditService_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <md:PackIcon Kind="Pencil" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Изменить"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="DeleteServiceButton" Style="{StaticResource ActionButton}" Click="DeleteService_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <md:PackIcon Kind="Delete" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Удалить"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource ActionButton}" Click="RefreshService_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <md:PackIcon Kind="Refresh" Width="16" Height="16" Margin="0,0,6,0"/>
+                        <TextBlock Text="Обновить"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Карточка -->
+        <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+            <Grid>
+                <!-- Заглушка -->
+                <TextBlock Text="Выберите услугу слева, чтобы увидеть её карточку и доп. элементы."
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Opacity="0.6">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Selected}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Карточка услуги -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Style>
+                        <Style TargetType="ScrollViewer">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Selected}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollViewer.Style>
+
+                    <StackPanel>
+                        <TextBlock Text="Карточка услуги" Style="{StaticResource CardTitleText}"/>
+
+                        <TextBlock Text="Название" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Selected.Name}" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Тип услуги" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Selected.ServiceType}" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Базовая цена" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Selected.BasePrice}" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Статус" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Selected.IsActive}" Margin="0,0,0,12"/>
+
+                        <GroupBox Header="Доп. элементы услуги" Margin="0,12,0,0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <DataGrid ItemsSource="{Binding SelectedServiceExtras}"
+                                          SelectedItem="{Binding SelectedExtraElement}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          IsReadOnly="True"
+                                          RowHeaderWidth="0"
+                                          GridLinesVisibility="None"
+                                          Height="180">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTextColumn Header="Цена" Binding="{Binding DefaultPrice}" Width="90"/>
+                                        <DataGridCheckBoxColumn Header="Активен" Binding="{Binding IsActive}" Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Right"
+                                            Margin="0,12,0,0">
+                                    <Button x:Name="AddExtraButton" Style="{StaticResource ActionButton}" Click="AddExtra_Click">
+                                        <StackPanel Orientation="Horizontal">
+                                            <md:PackIcon Kind="Plus" Width="16" Height="16" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Добавить"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="EditExtraButton" Style="{StaticResource ActionButton}" Click="EditExtra_Click">
+                                        <StackPanel Orientation="Horizontal">
+                                            <md:PackIcon Kind="Pencil" Width="16" Height="16" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Изменить"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="DeleteExtraButton" Style="{StaticResource ActionButton}" Click="DeleteExtra_Click">
+                                        <StackPanel Orientation="Horizontal">
+                                            <md:PackIcon Kind="Delete" Width="16" Height="16" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Удалить"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
